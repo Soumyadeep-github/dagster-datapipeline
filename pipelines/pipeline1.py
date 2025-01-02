@@ -221,14 +221,14 @@ def combined_data_asset(context: OpExecutionContext):
         WHERE tpep_pickup_datetime >= '{partition_dt}'
           AND tpep_pickup_datetime < '{next_day}'
     """
-    taxi_data = pd.read_sql(taxi_query, engine)
+    taxi_data = pd.read_sql(taxi_query, engine).drop(labels="id", axis=1)
 
     # Fetch relevant weather data rows from this date
     weather_query = f"""
         SELECT *
         FROM pipeline_db.public.weather_data
     """
-    weather_data = pd.read_sql(weather_query, engine)
+    weather_data = pd.read_sql(weather_query, engine).drop(labels="id", axis=1)
 
     if taxi_data.empty or weather_data.empty:
         context.log.info(
