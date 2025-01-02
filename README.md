@@ -2,7 +2,7 @@
 Data pipeline created in Dagster to schedule data to fetch and store the fetched data into a target database, in this case, PostgresSQL.
 
 Data sources:
-1. [https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2024-10.parquet](Link to Yellow Taxi trips dataset) This dataset is saved with daily and hourly partitions in Postgres DB where the output is being stored.
+1. (Link to Yellow Taxi trips dataset)[https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2024-10.parquet] This dataset is saved with daily and hourly partitions in Postgres DB where the output is being stored.
 2. (https://www.ncei.noaa.gov/data/global-hourly/access/)[Link to NOAA hourly data]
 Steps to use this:
 
