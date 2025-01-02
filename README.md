@@ -11,4 +11,10 @@ Steps to use this:
 3. Head over to [localhost:3000](http://localhost:3000/locations/pipelines.pipeline1/asset-groups/default) (the same location where Dagster is supposed to run in your local machine).
 4. Click `Materialize all` and follow this screenshot to set the upper bound date. ![upper-bound-date](https://github.com/user-attachments/assets/e4c09205-0d32-447c-8a26-f927d707cb44)
 5. To check the data, once the pipeline has successfully run execute the following:
-
+```
+$> docker exec -it postgres-data-db bash
+$> source initdb.d/.env
+$> psql $DB_URL
+pipeline_db=# \dt
+```
+This will allow you to check out all tables and the associated data.
