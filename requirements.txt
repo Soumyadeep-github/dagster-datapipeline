@@ -1,0 +1,14 @@
+dagit
+dagster
+dagster-postgres
+duckdb
+mysql-connector-python
+numpy
+pandas
+psycopg2-binary
+pytest
+pyarrow
+SQLAlchemy
+
+
+

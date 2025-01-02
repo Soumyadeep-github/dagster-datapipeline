@@ -1,0 +1,72 @@
+services:
+
+  dagster-dagit:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    depends_on:
+      - dagster-postgres
+      - data-db
+
+  dagster-daemon:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: "dagster-daemon run"
+    environment:
+      - PGPASS=${PGPASS}
+      - PGUID=${PGUID}
+    depends_on:
+      - dagster-postgres
+      - data-db
+
+  dagster-postgres:
+    image: postgres:14-alpine
+    ports:
+      - 5432:5432
+    volumes:
+      - dagster-pg-vol:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=${PGUID}
+      - POSTGRES_PASSWORD=${PGPASS}
+      - POSTGRES_DB=${DB_NAME}
+
+  pipeline-tests:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: >
+      bash -c "pytest -p no:cacheprovider /app/pipelines_tests/ --maxfail=1 --disable-warnings"
+    depends_on:
+      - data-db
+
+  data-db:
+    image: postgres:14-alpine
+    container_name: postgres-data-db
+    ports:
+      - 5434:5432
+    volumes: 
+      - ./init-user.sh:/docker-entrypoint-initdb.d/init-user.sh
+      - pg_data_db_vol:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=pipeline_db
+      - POSTGRES_USER=${DATA_DB_USER} 
+      - POSTGRES_PASSWORD=${DATA_DB_PASS} 
+  db-setup:
+    image: "postgres:14-alpine"
+    depends_on: 
+      - data-db
+    restart: "no"
+    volumes: 
+      - ./init-user.sh:/docker-entrypoint-initdb.d/init-user.sh
+      - pg_data_db_vol:/var/lib/postgresql/data
+    command: ["bash", "-c", "chmod +x /docker-entrypoint-initdb.d/init-user.sh && bash /docker-entrypoint-initdb.d/init-user.sh"]
+
+
+
+volumes:
+  dagster-pg-vol:
+    driver: local
+  pg_data_db_vol:
