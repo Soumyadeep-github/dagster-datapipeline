@@ -13,6 +13,8 @@ from sqlalchemy import create_engine
 from datetime import datetime, timedelta
 from io import StringIO, BytesIO
 from typing import List
+from dotenv import load_dotenv
+import os
 import requests
 import pandas as pd
 import psycopg2
@@ -26,8 +28,9 @@ daily_partition = DailyPartitionsDefinition(
     end_date="2024-10-07",    # inclusive
 )
 
-CONN_STRING = "postgresql://root:root@data-db:5432/pipeline_db"
+load_dotenv()
 
+CONN_STRING = os.getenv("DB_URL")
 
 ###############################################################################
 # NYC Taxi Data Asset, partitioned by the 7 days
@@ -38,10 +41,8 @@ def get_latest_nyc_taxi_data():
     Tries descending months until it finds a valid file.
     """
     base_url = "https://d37ci6vzurychx.cloudfront.net/trip-data/"
-    today = datetime.now().strftime("%Y-%m")
-    year, month = today.split("-")
-    month_int = int(month)
-
+    year = 2024
+    month_int = 12
     try:
         while month_int > 1:
             file_name = f"yellow_tripdata_{year}-{month_int}.parquet"
@@ -216,7 +217,7 @@ def combined_data_asset(context: OpExecutionContext):
     # Fetch relevant taxi data rows from this date
     taxi_query = f"""
         SELECT *
-        FROM nyc_taxi_data 
+        FROM pipeline_db.public.nyc_taxi_data 
         WHERE tpep_pickup_datetime >= '{partition_dt}'
           AND tpep_pickup_datetime < '{next_day}'
     """
@@ -225,7 +226,7 @@ def combined_data_asset(context: OpExecutionContext):
     # Fetch relevant weather data rows from this date
     weather_query = f"""
         SELECT *
-        FROM weather_data
+        FROM pipeline_db.public.weather_data
     """
     weather_data = pd.read_sql(weather_query, engine)
 

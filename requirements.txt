@@ -6,8 +6,9 @@ mysql-connector-python
 numpy
 pandas
 psycopg2-binary
-pytest
 pyarrow
+pytest
+python-dotenv
 SQLAlchemy
 
 

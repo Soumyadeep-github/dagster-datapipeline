@@ -47,9 +47,12 @@ services:
     container_name: postgres-data-db
     ports:
       - 5434:5432
+    expose:
+      - 5434
     volumes: 
-      - ./init-user.sh:/docker-entrypoint-initdb.d/init-user.sh
-      - pg_data_db_vol:/var/lib/postgresql/data
+      - ./init-db.sh:/initdb.d/init-db.sh
+      - ./.env/:/initdb.d/.env
+      - db_vol:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=pipeline_db
       - POSTGRES_USER=${DATA_DB_USER} 
@@ -60,13 +63,14 @@ services:
       - data-db
     restart: "no"
     volumes: 
-      - ./init-user.sh:/docker-entrypoint-initdb.d/init-user.sh
-      - pg_data_db_vol:/var/lib/postgresql/data
-    command: ["bash", "-c", "chmod +x /docker-entrypoint-initdb.d/init-user.sh && bash /docker-entrypoint-initdb.d/init-user.sh"]
+      - ./init-db.sh:/initdb.d/init-db.sh
+      - ./.env/:/initdb.d/.env
+      - db_vol:/var/lib/postgresql/data
+    command: ["bash", "-c", "chmod +x /initdb.d/init-db.sh && bash /initdb.d/init-db.sh"]
 
 
 
 volumes:
   dagster-pg-vol:
     driver: local
-  pg_data_db_vol:
+  db_vol:
